@@ -129,6 +129,17 @@ The following are practical defaults or implementation details, not additional i
 - Define name validation and duplicate-name handling during implementation so the scoreboard is unambiguous.
 - Store only the information needed to run the game; persistence and cleanup details remain to be chosen.
 
+## Implementation decisions (1 November 2026)
+
+- **Hosting:** static site on GitHub Pages. The host's browser tab acts as the game server; phones connect to it directly over WebRTC using PeerJS (its free public broker is used only to introduce devices). The host tab must stay open.
+- **Host screen:** a laptop or TV that shows the QR code, each question, how many players have answered, the reveal, the scoreboard, and the host controls.
+- **Questions:** a curated bank of about 50 questions; each game picks 10 at random without repeats and shuffles the answer order.
+- **Disconnections:** a phone that drops gets a 15-second grace period to reconnect from the same browser tab and carry on. If it stays away, the game is interrupted for everyone. In the lobby, a player who stays away is simply removed.
+- **Names:** required, up to 15 characters; duplicate names (ignoring capitals) are refused.
+- **Answers:** the first tap locks in the answer; the screen says so before the player taps.
+- **Restart:** "Play again" / "Start a new game" keeps the same QR code; phones still on the page show the join form again, and scores start from zero.
+- **Technology:** plain HTML, CSS and JavaScript with no build step. Game state lives only in the host tab's memory.
+
 ## Suggested delivery order
 
 1. Build the lobby, QR-code joining, and host/player roles.

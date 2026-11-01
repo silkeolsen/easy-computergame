@@ -131,7 +131,7 @@ function handleJoin(entry, msg) {
   if (game.phase !== "lobby") return fail("This game has already started. Wait for the host to start a new one.");
   const name = cleanName(msg.name);
   if (!name) return fail("Please type your name first.");
-  if (game.players.length >= PLAYERS_NEEDED) return fail("This game already has four players.");
+  if (game.players.length >= MAX_PLAYERS) return fail(`This game is full — it already has ${MAX_PLAYERS} players.`);
   if (game.players.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
     return fail(`Someone is already called “${name}”. Try adding an initial.`);
   }
@@ -180,7 +180,7 @@ function reveal() {
 }
 
 function canStart() {
-  return game.players.length === PLAYERS_NEEDED && game.players.every((p) => p.connected);
+  return game.players.length >= MIN_PLAYERS && game.players.every((p) => p.connected);
 }
 
 function startGame() {
@@ -274,15 +274,29 @@ function qrSvg(text) {
     <rect x="-2" y="-2" width="${n + 4}" height="${n + 4}" fill="#fff"/><path d="${path}" fill="#2b2140"/></svg>`;
 }
 
-function playerChips(statusFor) {
+// In the lobby, empty slots show how many more can join; during a game only real players appear.
+function playerChips(statusFor, slots = game.players.length) {
   const chips = [];
-  for (let i = 0; i < PLAYERS_NEEDED; i++) {
+  for (let i = 0; i < slots; i++) {
     const p = game.players[i];
-    if (!p) { chips.push(`<div class="chip waiting">Waiting for player ${i + 1}…</div>`); continue; }
+    if (!p) {
+      chips.push(`<div class="chip waiting">${i < MIN_PLAYERS ? `Waiting for player ${i + 1}…` : `Player ${i + 1} (optional)`}</div>`);
+      continue;
+    }
     const [cls, status] = p.connected ? statusFor(p) : ["away", "Reconnecting…"];
     chips.push(`<div class="chip filled ${cls}"><span>${esc(p.name)}</span><span class="status">${status}</span></div>`);
   }
   return `<div class="players">${chips.join("")}</div>`;
+}
+
+function lobbyHint(count, ready) {
+  if (count < MIN_PLAYERS) {
+    const more = MIN_PLAYERS - count;
+    return `Waiting for at least ${more} more player${more === 1 ? "" : "s"}…`;
+  }
+  if (!ready) return "Waiting for everyone to reconnect…";
+  if (count === MAX_PLAYERS) return "The game is full. Press start when you're ready!";
+  return `Press start when you're ready, or wait for up to ${MAX_PLAYERS - count} more to join.`;
 }
 
 function optionsHtml(q, revealed) {
@@ -313,12 +327,11 @@ function render() {
         </div>
       </div>
       <div class="card">
-        <h2>Players (${count} of ${PLAYERS_NEEDED})</h2>
-        ${playerChips(() => ["", "Ready ✓"])}
+        <h2>Players (${count} of up to ${MAX_PLAYERS})</h2>
+        ${playerChips(() => ["", "Ready ✓"], MAX_PLAYERS)}
         <div class="host-controls">
-          <button class="btn" id="start" ${ready ? "" : "disabled"}>Start the quiz</button>
-          <p class="hint muted">${ready ? "Everyone's here. Press start when you're ready!" :
-            `Waiting for ${PLAYERS_NEEDED - count > 0 ? PLAYERS_NEEDED - count + " more player" + (PLAYERS_NEEDED - count === 1 ? "" : "s") : "everyone to reconnect"}…`}</p>
+          <button class="btn" id="start" ${ready ? "" : "disabled"}>${ready ? `Start the quiz with ${count} players` : "Start the quiz"}</button>
+          <p class="hint muted">${lobbyHint(count, ready)}</p>
         </div>
       </div>`;
     document.getElementById("start").onclick = startGame;
@@ -334,7 +347,7 @@ function render() {
         ${optionsHtml(q, false)}
       </div>
       <div class="card">
-        <h2>${answered} of ${PLAYERS_NEEDED} players have answered</h2>
+        <h2>${answered} of ${game.players.length} players have answered</h2>
         ${playerChips((p) => p.answer !== null ? ["done", "Answered ✓"] : ["", "Thinking…"])}
         <p class="hint muted" style="margin-top:16px">The answer appears automatically once everyone has answered.</p>
       </div>`;

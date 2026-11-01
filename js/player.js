@@ -189,7 +189,7 @@ function render() {
         <div class="trophy">🎉</div>
         <h1>You're in, ${esc(s.name)}!</h1>
         <p class="big">Waiting for the host to start the quiz.</p>
-        <p class="muted">${s.lobbyNames.length} of ${PLAYERS_NEEDED} players: ${esc(joinNames(s.lobbyNames))}</p>
+        <p class="muted">Players so far: ${esc(joinNames(s.lobbyNames))}</p>
       </div>
       <p class="center muted">Keep this page open and your screen on.</p>`;
   }
@@ -214,7 +214,7 @@ function render() {
           ${header}
           <div class="locked">🔒 Your answer is locked in:<br><strong>${LETTERS[mine]}. ${esc(s.options[mine])}</strong></div>
           <p class="center big">${s.yourAnswer === null ? "Sending…" :
-            `Waiting for everyone… <strong>${s.answeredCount} of ${PLAYERS_NEEDED}</strong> have answered.`}</p>
+            `Waiting for everyone… <strong>${s.answeredCount} of ${s.lobbyNames.length}</strong> have answered.`}</p>
         </div>`;
     }
   }

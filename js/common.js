@@ -1,6 +1,7 @@
 // Shared settings and helpers for the host and player pages.
 const PEER_PREFIX = "familypubquiz-";
-const PLAYERS_NEEDED = 4;
+const MIN_PLAYERS = 2;
+const MAX_PLAYERS = 4;
 const QUESTIONS_PER_GAME = 10;
 const GRACE_MS = 15000;   // how long a dropped phone may take to come back
 const PING_MS = 3000;     // heartbeat interval

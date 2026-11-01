@@ -1,12 +1,12 @@
 # Family Pub Quiz
 
-A cheerful ten-question pub quiz for a host screen and four players on their phones. See [PRD.md](PRD.md) for the requirements.
+A cheerful ten-question pub quiz for a host screen and two to four players on their phones. See [PRD.md](PRD.md) for the requirements.
 
 ## How to play
 
 1. Open the site on a laptop or TV — this is the **host screen**. Keep it open for the whole game.
 2. Each player scans the QR code with their phone and types their name.
-3. When all four have joined, the host presses **Start the quiz**.
+3. Once at least two players have joined (up to four can play), the host presses **Start the quiz**.
 4. Players tap an answer on their phone. Once everyone has answered, the correct answer and scoreboard appear.
 5. The host presses **Next question** until the final results.
 
